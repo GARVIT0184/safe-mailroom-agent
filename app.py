@@ -1,36 +1,39 @@
-
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-@app.post("/")
+@app.route("/", methods=["POST"])
 def mailroom():
 
-    body = request.get_json()
+    data = request.get_json(silent=True)
 
-    if not body:
+    if not data:
+        return jsonify({"error": "Invalid JSON"}), 400
+
+    operation = data.get("operation")
+
+    if operation == "propose":
         return jsonify({
-            "error":"Invalid JSON"
-        }),400
+            "status": "awaiting_receipts",
+            "proposals": []
+        }), 200
 
-    operation = body.get("operation")
-
-    if operation=="propose":
+    elif operation == "commit":
         return jsonify({
-            "status":"awaiting_receipts",
-            "proposals":[]
-        })
+            "status": "completed",
+            "outcomes": []
+        }), 200
 
-    elif operation=="commit":
-        return jsonify({
-            "status":"completed",
-            "outcomes":[]
-        })
+    return jsonify({"error": "Unknown operation"}), 400
 
+
+@app.route("/", methods=["GET"])
+def home():
     return jsonify({
-        "error":"Unknown operation"
-    }),400
+        "service": "Safe Mailroom Agent",
+        "status": "running"
+    })
 
 
-if __name__=="__main__":
-    app.run(host="0.0.0.0",port=5000)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
