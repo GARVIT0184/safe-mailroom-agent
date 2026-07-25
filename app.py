@@ -5,7 +5,10 @@ app = Flask(__name__)
 @app.route("/", methods=["POST"])
 def mailroom():
 
-    data = request.get_json(silent=True)
+    import json
+
+data = request.get_json(silent=True)
+print(json.dumps(data, indent=2), flush=True)
 
     if not data:
         return jsonify({"error": "Invalid JSON"}), 400
@@ -25,7 +28,7 @@ def mailroom():
         }), 200
 
     return jsonify({"error": "Unknown operation"}), 400
-    print(request.get_json())
+   
 
 
 @app.route("/", methods=["GET"])
