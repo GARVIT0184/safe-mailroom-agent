@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from rules import decide_action
 import uuid
 import json
+import hashlib
 
 app = Flask(__name__)
 
@@ -38,11 +39,19 @@ def mailroom():
                 "evidence": decision["evidence"]
             })
 
+        input_digest = hashlib.sha256(
+            json.dumps(
+                data,
+                sort_keys=True,
+                separators=(",", ":")
+            ).encode("utf-8")
+        ).hexdigest()
+
         return jsonify({
             "profile": data.get("profile"),
             "evaluationId": data.get("evaluationId"),
             "status": "awaiting_receipts",
-            "inputDigest": "",
+            "inputDigest": input_digest,
             "proposals": proposals
         }), 200
 
@@ -55,6 +64,7 @@ def mailroom():
             "profile": data.get("profile"),
             "evaluationId": data.get("evaluationId"),
             "status": "completed",
+            "inputDigest": data.get("inputDigest"),
             "outcomes": []
         }), 200
 
