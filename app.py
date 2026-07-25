@@ -25,6 +25,7 @@ def mailroom():
         }), 200
 
     return jsonify({"error": "Unknown operation"}), 400
+    print(request.get_json())
 
 
 @app.route("/", methods=["GET"])
